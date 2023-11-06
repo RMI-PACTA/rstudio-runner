@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "identity": {
+      "value": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourcegroups/XXXXXXXXXXXXXXXXX/providers/Microsoft.ManagedIdentity/userAssignedIdentities/XXXXXXXXXXX"
+    },
+    "serviceprincipal": {
+      "value": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    },
+    "dataprep2021q4-storageaccountkey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/XXXXXXXXXXXXXXXX/providers/Microsoft.KeyVault/vaults/XXXXXXXXXXXXXXX"
+        },
+        "secretName": "dataprep2021q4-storageaccountkey"
+      }
+    },
+    "subnetId": {
+      "value": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/XXXXXXXXXXXXXX/providers/Microsoft.Network/virtualNetworks/XXXXXXXXXXXXX/subnets/XXXXXXXXXXXXXXXXXX"
+    }
+  }
+}

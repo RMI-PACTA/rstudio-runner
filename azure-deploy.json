@@ -1,0 +1,138 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "0.0.4",
+
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "identity": {
+      "type": "string",
+      "metadata": {
+        "description": "The ID of the user assigned identity to use for the container group."
+      }
+    },
+    "serviceprincipal": {
+      "type": "string",
+      "metadata": {
+        "description": "The ID of the service principal to use for the container group."
+      }
+    },
+    "containerGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the container group."
+      }
+    },
+    "restartPolicy": {
+      "type": "string",
+      "defaultValue": "OnFailure",
+      "allowedValues": [
+        "Always",
+        "Never",
+        "OnFailure"
+      ],
+      "metadata": {
+        "description": "The behavior of Azure runtime if container has stopped."
+      }
+    },
+    "dataprep2021q4-storageaccountkey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The storage account key for the rawdata storage account."
+      }
+    },
+    "subnetId": {
+      "type": "string",
+      "metadata": {
+        "description": "The subnet ID to use for the container group."
+      }
+    }
+  },
+
+  "variables": {
+    "machineCpuCores": 2,
+    "machineMemoryInGB": 8,
+    "mountPathFiles": "/mnt/files"
+  },
+
+  "functions": [],
+
+  "resources": [
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2021-09-01",
+      "name": "[parameters('containerGroupName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[parameters('identity')]": {}
+        }
+      },
+      "properties": {
+        "containers": [
+          {
+            "name": "rstudio",
+            "properties": {
+              "image": "rocker/verse",
+              "ports": [
+                {
+                  "port": 8787,
+                  "protocol": "TCP"
+                }
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": "[variables('machineCpuCores')]",
+                  "memoryInGB": "[variables('machineMemoryInGB')]"
+                }
+              },
+              "environmentVariables": [
+                {
+                  "name": "PASSWORD",
+                  "value": "rstudio"
+                }
+              ],
+              "volumeMounts": [
+                {
+                  "name": "files",
+                  "mountPath": "[variables('mountPathFiles')]"
+                }
+              ]
+            }
+          }
+        ],
+        "restartPolicy": "[parameters('restartPolicy')]",
+        "subnetIds": [
+          {
+            "name": "server",
+            "id": "[parameters('subnetId')]"
+          }
+        ],
+        "osType": "Linux",
+        "volumes": [
+          {
+            "name": "files",
+            "azureFile": {
+              "shareName": "rawdata",
+              "readOnly": false,
+              "storageAccountName": "dataprep2021q4",
+              "storageAccountKey": "[parameters('dataprep2021q4-storageaccountkey')]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+"outputs": {
+    "containerIPv4Address": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerGroupName'))).ipAddress.ip]"
+    }
+  }
+}
