@@ -1,5 +1,9 @@
 # RStudio Runner
 
+[![Project Status: Unsupported](https://www.repostatus.org/badges/latest/unsupported.svg)](https://www.repostatus.org/#unsupported)
+
+**This project is archived for future reference, but no new work is expected in this repository.**
+
 Run a rocker/rstudio container on Azure Container Instances
 
 deploying this requires the [az cli](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
